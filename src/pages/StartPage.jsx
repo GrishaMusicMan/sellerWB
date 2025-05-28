@@ -6,7 +6,7 @@ import Label from "../component/Label";
 
 const StartPage = () => {
   const token =
-    "eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjQxMTE4djEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTc0ODM3MzU2OCwiaWQiOiIwMTkzNjc1Ni1lNWU5LTc2N2EtOTJhMy1hYzA0NTZmNmY3MGUiLCJpaWQiOjg4ODM1NjQ2LCJvaWQiOjk0MzY1NSwicyI6NDgsInNpZCI6IjBiMGRiNDM5LTlkNzgtNDUxMC04ZTQxLTA0MzU3OWM4ODEzYSIsInQiOmZhbHNlLCJ1aWQiOjg4ODM1NjQ2fQ.7tI2gWia1qs_QbOrxEoSCNMSk3QK3U0-WgUIHE4OEG8WaKs2HrvWnrX9tysXl4Ic5MLNuS1NwOt7RExvHJiIjg"; // Замените на ваш токен
+    "eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjUwNTIwdjEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTc2NDE3Nzg2NywiaWQiOiIwMTk3MTU1OS01Y2I4LTdlNjktOThkNi00ODMxZDdiZjcwMjUiLCJpaWQiOjg4ODM1NjQ2LCJvaWQiOjk0MzY1NSwicyI6NDgsInNpZCI6IjBiMGRiNDM5LTlkNzgtNDUxMC04ZTQxLTA0MzU3OWM4ODEzYSIsInQiOmZhbHNlLCJ1aWQiOjg4ODM1NjQ2fQ.yHF9uk14LbJkbbSuUZqd7i5yOrHR-g-9x3q5cy4RZKzRUkff2ck8jD9kkqJDCdgZjtsLeyJjRLznJcm0w2SFyg"; // Замените на ваш токен
 
   const tableData = useSelector((state) => state.tableData);
 
@@ -17,6 +17,12 @@ const StartPage = () => {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
+
+  const [loadedCount, setLoadedCount] = useState(0);
+
+  const handleLabelLoaded = () => {
+    setLoadedCount((prev) => prev + 1);
+  };
 
   useEffect(() => {
     // Группируем данные по артикулу
@@ -39,6 +45,10 @@ const StartPage = () => {
     setSortData(sortedData);
   }, [tableData]);
 
+  useEffect(() => {
+    setLoadedCount(0);
+  }, [currentPage]);
+
   const getPageItems = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -58,7 +68,18 @@ const StartPage = () => {
   console.log("фильтрованный массив", getPageItems())
   return (
     <div>
+
+      
       <div className={classes.pagin}>
+      <div>
+          {loadedCount < getPageItems().length ? (
+      <div className={classes.loaderText}>
+        Загружено {loadedCount} из {getPageItems().length}
+      </div>
+    ) : (
+      <div className={classes.successText}>Успешно загружено</div>
+      )}
+      </div>
         <button
           className={classes.btn}
           onClick={handlePrevPage}
@@ -77,6 +98,8 @@ const StartPage = () => {
           next
         </button>
       </div>
+      
+     
 
       <div ref={componentRef}>
         {sortData.length > 0 ? (
@@ -87,6 +110,7 @@ const StartPage = () => {
               data={item}
               ind={index}
               currentPage={currentPage}
+              onLoaded={handleLabelLoaded}
             />
           ))
         ) : (
@@ -97,7 +121,7 @@ const StartPage = () => {
         )}
       </div>
       <button className={classes.print} onClick={handlePrint}>
-        Print this page!
+        ПЕЧАТЬ
       </button>
     </div>
   );

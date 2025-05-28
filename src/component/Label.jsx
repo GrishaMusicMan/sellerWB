@@ -26,6 +26,7 @@ const Label = (props) => {
       );
       const info = await response.json();
       setData(info.stickers);
+      if (props.onLoaded) props.onLoaded()
     } catch (error) {
       console.error("Ошибка загрузки данных:", error);
     } finally {
