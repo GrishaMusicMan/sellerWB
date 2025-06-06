@@ -13,7 +13,7 @@ const FirstPage = () => {
     dispatch(
       setTableData([
         ...tableData,
-        { col: tableData.length + 1, article: "", id: "", name: "" },
+        { col: tableData.length + 1, id: "", name: "", article: "" },
       ]),
     );
   };
@@ -27,7 +27,7 @@ const FirstPage = () => {
       dispatch(
         setTableData([
           ...updatedData,
-          { col: tableData.length + 1, article: "", id: "", name: "" },
+          { col: tableData.length + 1, id: "", name: "", article: "" },
         ]),
       );
     } else {
@@ -48,16 +48,16 @@ const FirstPage = () => {
             if (index < tableData.length) {
               acc.push({
                 ...tableData[index],
-                article: tableData[index].article || cells[0] || "",
-                id: tableData[index].id || cells[1] || "",
-                name: tableData[index].name || cells[2] || "",
+                id: tableData[index].id || cells[0] || "",
+                name: tableData[index].name || cells[1] || "",
+                article: tableData[index].article || cells[2] || "",
               });
             } else {
               acc.push({
                 col: tableData.length + index + 1,
-                article: cells[0] || "",
-                id: cells[1] || "",
-                name: cells[2] || "",
+                id: cells[0] || "",
+                name: cells[1] || "",
+                article: cells[2] || "",
               });
             }
           }
@@ -68,11 +68,11 @@ const FirstPage = () => {
   };
 
   const clearTable = () => {
-    dispatch(setTableData([{ col: 1, article: "", id: "", name: "" }]));
+    dispatch(setTableData([{ col: 1, id: "", name: "", article: "" }]));
   };
 
   return (
-    <div classname={classes.main}>
+    <div className={classes.main}>
       <div>
         <Link
           className={classes.button}
@@ -83,7 +83,7 @@ const FirstPage = () => {
           Получить стикеры
         </Link>
       </div>
-      <div clasename={classes.table}>
+      <div className={classes.table}>
         <button type="button" onClick={addRow}>
           Добавить строку
         </button>
@@ -94,9 +94,9 @@ const FirstPage = () => {
           <thead>
             <tr>
               <th>ID (col)</th>
-              <th>Колонка 1 (article)</th>
-              <th>Колонка 2 (id)</th>
-              <th>Колонка 3 (name)</th>
+              <th>Колонка 1 (id)</th>
+              <th>Колонка 2 (name)</th>
+              <th>Колонка 3 (article)</th>
             </tr>
           </thead>
           <tbody>
@@ -104,16 +104,7 @@ const FirstPage = () => {
               <tr key={row.col}>
                 <td>{row.col}</td>
                 <td>
-                  <input
-                    type="text"
-                    value={row.article}
-                    onChange={(e) =>
-                      handleInputChange(row.col, "article", e.target.value)
-                    }
-                  />
-                </td>
-                <td>
-                  <input
+                  <input                 
                     type="text"
                     value={row.id}
                     onChange={(e) =>
@@ -127,6 +118,15 @@ const FirstPage = () => {
                     value={row.name}
                     onChange={(e) =>
                       handleInputChange(row.col, "name", e.target.value)
+                    }
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={row.article}
+                    onChange={(e) =>
+                      handleInputChange(row.col, "article", e.target.value)
                     }
                   />
                 </td>

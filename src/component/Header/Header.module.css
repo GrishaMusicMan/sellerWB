@@ -1,7 +1,7 @@
 .wrapper {
     background: linear-gradient(90deg,#cb11ab,#481173);
     padding-top: 10px;
-    padding-bottom: 30px;
+    padding-bottom: 10px;
     position: sticky;
     top: 0;
 }
