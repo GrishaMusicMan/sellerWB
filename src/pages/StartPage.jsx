@@ -6,7 +6,7 @@ import Label from "../component/Label";
 
 const StartPage = () => {
   const token =
-    "eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjUwNTIwdjEiLCJ0eXAiOiJKV1QifQ.eyJlbnQiOjEsImV4cCI6MTc2NDE3Nzg2NywiaWQiOiIwMTk3MTU1OS01Y2I4LTdlNjktOThkNi00ODMxZDdiZjcwMjUiLCJpaWQiOjg4ODM1NjQ2LCJvaWQiOjk0MzY1NSwicyI6NDgsInNpZCI6IjBiMGRiNDM5LTlkNzgtNDUxMC04ZTQxLTA0MzU3OWM4ODEzYSIsInQiOmZhbHNlLCJ1aWQiOjg4ODM1NjQ2fQ.yHF9uk14LbJkbbSuUZqd7i5yOrHR-g-9x3q5cy4RZKzRUkff2ck8jD9kkqJDCdgZjtsLeyJjRLznJcm0w2SFyg"; // Замените на ваш токен
+    "eyJhbGciOiJFUzI1NiIsImtpZCI6IjIwMjUwOTA0djEiLCJ0eXAiOiJKV1QifQ.eyJhY2MiOjEsImVudCI6MSwiZXhwIjoxNzc5NzYwNDEzLCJpZCI6IjAxOWFiNjI0LTI2ZjEtNzFkNi05N2E1LTZmZTBhYjkyNzYzYyIsImlpZCI6ODg4MzU2NDYsIm9pZCI6OTQzNjU1LCJzIjo0OCwic2lkIjoiMGIwZGI0MzktOWQ3OC00NTEwLThlNDEtMDQzNTc5Yzg4MTNhIiwidCI6ZmFsc2UsInVpZCI6ODg4MzU2NDZ9.DCrB9E_Z20jwGvcam_uv67MhafBMaCRRofZ_r8_Z52qd5KRlDv3iCdxU8CeBDhnnfs4269i7ez5jdts0_bu2og"; // Замените на ваш токен
 
   const tableData = useSelector((state) => state.tableData);
 
