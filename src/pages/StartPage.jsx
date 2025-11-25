@@ -4,32 +4,24 @@ import { useReactToPrint } from "react-to-print";
 import classes from "./StartPage.module.css";
 import Label from "../component/Label";
 
+// Вынесли вспомогательную функцию наружу компонента
+const getInitialToken = () => {
+  if (typeof window === "undefined") {
+    return "";
+  }
+  try {
+    return window.localStorage.getItem("wb_token") || "";
+  } catch {
+    return "";
+  }
+};
+
 const StartPage = () => {
-  // Функция для безопасного чтения токена
-  const getInitialToken = () => {
-    // Если мы в Node (dev-сервер, HtmlWebpackPlugin и т.п.) – не трогаем localStorage вообще
-    if (
-      typeof process !== "undefined" &&
-      process.versions &&
-      process.versions.node
-    ) {
-      return "";
-    }
-
-    try {
-      if (typeof window !== "undefined" && window.localStorage) {
-        return window.localStorage.getItem("wb_token") || "";
-      }
-      return "";
-    } catch (e) {
-      return "";
-    }
-  };
-
-  // состояние токена
+  // токен и поле ввода токена
   const [token, setToken] = useState(getInitialToken);
-  const [tokenInput, setTokenInput] = useState("");
+  const [tokenInput, setTokenInput] = useState(getInitialToken());
 
+  // таблица с данными
   const tableData = useSelector((state) => state.tableData);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,7 +38,7 @@ const StartPage = () => {
     setLoadedCount((prev) => prev + 1);
   };
 
-  // Группировка/сортировка данных
+  // группировка и сортировка данных по article
   useEffect(() => {
     const groupedData = tableData.reduce((acc, item) => {
       if (!acc[item.article]) {
@@ -64,28 +56,12 @@ const StartPage = () => {
     setSortData(sortedData);
   }, [tableData]);
 
-  // Сбрасываем счётчик загруженных стикеров на смене страницы
+  // сброс счётчика при смене страницы
   useEffect(() => {
     setLoadedCount(0);
   }, [currentPage]);
 
-  const getPageItems = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return sortData.slice(startIndex, endIndex);
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
-
-  const totalPages = Math.ceil(sortData.length / itemsPerPage);
-
-  // сохраняем токен, введённый пользователем
+  // сохранить токен из формы
   const handleSaveToken = (e) => {
     e.preventDefault();
     const value = tokenInput.trim();
@@ -95,28 +71,27 @@ const StartPage = () => {
       if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem("wb_token", value);
       }
-    } catch (e) {
-      // если вдруг localStorage недоступен – просто пропускаем
+    } catch {
+      // если localStorage недоступен — просто игнорируем
     }
 
     setToken(value);
-    setTokenInput("");
   };
 
+  // очистить токен
   const handleClearToken = () => {
     try {
       if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.removeItem("wb_token");
       }
-    } catch (e) {
+    } catch {
       // игнорируем
     }
     setToken("");
     setTokenInput("");
   };
 
-  // 🔴 ВАЖНО: if (!token) стоит ТЕПЕРЬ ПОСЛЕ всех хуков,
-  // поэтому ESLint больше не ругается на "hooks called conditionally"
+  // ⬇️ ВАЖНО: условный рендер уже ПОСЛЕ всех хуков
   if (!token) {
     return (
       <div className={classes.tokenWrapper}>
@@ -136,6 +111,22 @@ const StartPage = () => {
       </div>
     );
   }
+
+  const getPageItems = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return sortData.slice(startIndex, endIndex);
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prevPage) => prevPage - 1);
+  };
+
+  const totalPages = Math.ceil(sortData.length / itemsPerPage);
 
   console.log("фильтрованный массив", getPageItems());
 
@@ -184,7 +175,7 @@ const StartPage = () => {
           ))
         ) : (
           <div className={classes.container}>
-            <span className={classes.loader}></span>
+            <span className={classes.loader}></span>{" "}
             <div className={classes.err}>Загружаем данные</div>
           </div>
         )}
@@ -193,9 +184,12 @@ const StartPage = () => {
       <button className={classes.print} onClick={handlePrint}>
         ПЕЧАТЬ
       </button>
-      <button className={classes.btn} onClick={handleClearToken}>
-        Сменить токен
-      </button>
+
+      <div className={classes.pagin}>
+        <button className={classes.btn} onClick={handleClearToken}>
+          Сменить токен
+        </button>
+      </div>
     </div>
   );
 };
