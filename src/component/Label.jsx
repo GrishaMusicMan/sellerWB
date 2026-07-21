@@ -1,69 +1,102 @@
 import React, { useEffect, useState } from "react";
+import { fetchWildberriesSticker } from "../api/wildberriesApi";
 import classes from "./Label.module.css";
 
 const Label = (props) => {
-  const [data, setData] = useState(null); // Данные по стикерам
-  const [isLoading, setIsLoading] = useState(false); // Флаг загрузки
-
-  const initData = async () => {
-    if (isLoading) return; // Если уже идёт загрузка, не делаем новый запрос
-    setIsLoading(true); // Устанавливаем флаг загрузки
-
-    try {
-      const response = await fetch(
-        "https://marketplace-api.wildberries.ru/api/v3/orders/stickers?type=png&width=58&height=40",
-        {
-          method: "POST",
-          headers: {
-            accept: "application/json",
-            Authorization: props.token,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            orders: [Number(props.data.id)],
-          }),
-        }
-      );
-      const info = await response.json();
-      setData(info.stickers);
-      if (props.onLoaded) props.onLoaded()
-    } catch (error) {
-      console.error("Ошибка загрузки данных:", error);
-    } finally {
-      setTimeout(() => setIsLoading(false), 500); // Минимальная задержка перед следующим запросом
-    }
-  };
+  const [sticker, setSticker] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+
+    const loadSticker = async () => {
+      setIsLoading(true);
+      setError(null);
+      setSticker(null);
+
+      try {
+        const loadedSticker = await fetchWildberriesSticker(
+          props.data.id,
+          props.token,
+          controller.signal
+        );
+
+        setSticker(loadedSticker);
+
+        if (props.onLoaded) {
+          props.onLoaded();
+        }
+      } catch (requestError) {
+        if (requestError.name === "AbortError") {
+          return;
+        }
+
+        console.error(
+          `Ошибка загрузки этикетки ${props.data.id}:`,
+          requestError
+        );
+
+        setError(requestError.message);
+
+        if (props.onError) {
+          props.onError(requestError);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     const timer = setTimeout(() => {
-      initData();
-    }, props.ind * 200); // Умножаем индекс на 200 для плавности запросов
-    return () => clearTimeout(timer);
-  }, [props.data.id]);
+      loadSticker();
+    }, props.ind * 200);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [props.data.id, props.ind, props.token]);
 
   return (
     <div className={classes.top}>
-      {data ? (
+      {isLoading && (
         <div className={classes.container}>
-          <p className={classes.text}>
-            <p className={classes.wrapper}>
+          <span className={classes.loader}></span>
+          <div className={classes.textLoader}>Загружаем этикетку</div>
+        </div>
+      )}
+
+      {!isLoading && error && (
+        <div className={classes.container}>
+          <div className={classes.textLoader}>
+            Ошибка загрузки задания {props.data.id}: {error}
+          </div>
+        </div>
+      )}
+
+      {!isLoading && !error && sticker && (
+        <div className={classes.container}>
+          <div className={classes.text}>
+            <div className={classes.wrapper}>
               <span className={classes.textSpanSuper}>
                 {props.data.article} -{" "}
               </span>
-              <span className={classes.textSpan}>{props.data.name} - </span>
-              <span className={classes.textSpanSuper}>{data[0]?.partB}</span>
-            </p>
-          </p>
+
+              <span className={classes.textSpan}>
+                {props.data.name} -{" "}
+              </span>
+
+              <span className={classes.textSpanSuper}>
+                {sticker.partB}
+              </span>
+            </div>
+          </div>
+
           <img
             className={classes.img}
-            src={`data:image/jpeg;base64,${data[0]?.file}`}
-            alt="Sticker"
+            src={`data:image/png;base64,${sticker.file}`}
+            alt={`Этикетка задания ${props.data.id}`}
           />
-        </div>
-      ) : (
-        <div className={classes.container}>
-          <span className={classes.loader}></span>{" "}
-          <div className={classes.textLoader}>Загружаем этикетки</div>
         </div>
       )}
     </div>
