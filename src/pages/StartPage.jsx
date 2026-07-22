@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useReactToPrint } from "react-to-print";
 import classes from "./StartPage.module.css";
@@ -34,9 +34,9 @@ const StartPage = () => {
 
   const [loadedCount, setLoadedCount] = useState(0);
 
-  const handleLabelLoaded = () => {
+  const handleLabelLoaded = useCallback(() => {
     setLoadedCount((prev) => prev + 1);
-  };
+  }, []);
 
   // группировка и сортировка данных по article
   useEffect(() => {
