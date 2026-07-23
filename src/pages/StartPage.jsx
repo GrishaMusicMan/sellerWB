@@ -16,10 +16,35 @@ const getInitialToken = () => {
   }
 };
 
+const getInitialOzonClientId = () => {
+  return localStorage.getItem("ozon_client_id") || "";
+};
+
+const getInitialOzonApiKey = () => {
+  return localStorage.getItem("ozon_api_key") || "";
+};
+
 const StartPage = () => {
-  // токен и поле ввода токена
+  // Wildberries
   const [token, setToken] = useState(getInitialToken);
   const [tokenInput, setTokenInput] = useState(getInitialToken());
+
+  // Ozon
+  const [ozonClientId, setOzonClientId] = useState(
+    getInitialOzonClientId
+  );
+
+  const [ozonClientIdInput, setOzonClientIdInput] = useState(
+    getInitialOzonClientId()
+  );
+
+  const [ozonApiKey, setOzonApiKey] = useState(
+    getInitialOzonApiKey
+  );
+
+  const [ozonApiKeyInput, setOzonApiKeyInput] = useState(
+    getInitialOzonApiKey()
+  );
 
   // таблица с данными
   const tableData = useSelector((state) => state.tableData);
@@ -78,6 +103,27 @@ const StartPage = () => {
     setToken(value);
   };
 
+  const handleSaveOzonCredentials = () => {
+    const normalizedClientId = ozonClientIdInput.trim();
+    const normalizedApiKey = ozonApiKeyInput.trim();
+
+    if (!normalizedClientId) {
+      alert("Введите Ozon Client-Id");
+      return;
+    }
+
+    if (!normalizedApiKey) {
+      alert("Введите Ozon Api-Key");
+      return;
+    }
+
+    localStorage.setItem("ozon_client_id", normalizedClientId);
+    localStorage.setItem("ozon_api_key", normalizedApiKey);
+
+    setOzonClientId(normalizedClientId);
+    setOzonApiKey(normalizedApiKey);
+  };
+
   // очистить токен
   const handleClearToken = () => {
     try {
@@ -89,6 +135,17 @@ const StartPage = () => {
     }
     setToken("");
     setTokenInput("");
+  };
+
+  const handleDeleteOzonCredentials = () => {
+  localStorage.removeItem("ozon_client_id");
+  localStorage.removeItem("ozon_api_key");
+
+  setOzonClientId("");
+  setOzonClientIdInput("");
+
+  setOzonApiKey("");
+  setOzonApiKeyInput("");
   };
 
   // ⬇️ ВАЖНО: условный рендер уже ПОСЛЕ всех хуков
@@ -166,6 +223,8 @@ const StartPage = () => {
           getPageItems().map((item, index) => (
             <Label
               token={token}
+              ozonClientId={ozonClientId}
+              ozonApiKey={ozonApiKey}
               key={item.id}
               data={item}
               ind={index}
@@ -187,8 +246,46 @@ const StartPage = () => {
 
       <div className={classes.pagin}>
         <button className={classes.btn} onClick={handleClearToken}>
-          Сменить токен
+          Сменить токен WB
         </button>
+      </div>
+
+      <div className={classes.pagin}>
+        <div>
+          <input
+            type="text"
+            placeholder="Ozon Client-Id"
+            value={ozonClientIdInput}
+            onChange={(event) =>
+              setOzonClientIdInput(event.target.value)
+            }
+          />
+
+          <input
+            type="password"
+            placeholder="Ozon Api-Key"
+            value={ozonApiKeyInput}
+            onChange={(event) =>
+              setOzonApiKeyInput(event.target.value)
+            }
+          />
+
+          <button
+            className={classes.btn}
+            type="button"
+            onClick={handleSaveOzonCredentials}
+          >
+            Сохранить данные Ozon
+          </button>
+
+          <button
+            className={classes.btn}
+            type="button"
+            onClick={handleDeleteOzonCredentials}
+          >
+            Удалить данные Ozon
+          </button>
+        </div>
       </div>
     </div>
   );
